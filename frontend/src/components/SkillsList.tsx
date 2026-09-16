@@ -13,7 +13,7 @@ function SkillsList() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://localhost:3005/api/listado', {
+    fetch('https://r4-7v1k.onrender.com/api/listado', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
