@@ -2,7 +2,7 @@ import express from "express";
 import { listarSkills } from "./modules/consultas.js";
 
 const app = express();
-const port = 3005;
+const port = 10000;
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173");
