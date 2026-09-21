@@ -1,0 +1,5 @@
+import type { PortfolioData, PortfolioItem, Profile } from '../types/portfolio.ts'
+// En producción se define VITE_API_URL; durante desarrollo Vite redirige /api al backend local.
+const apiUrl = import.meta.env.VITE_API_URL ?? '/api'
+async function request<T>(path: string, options?: RequestInit): Promise<T> { const response = await fetch(`${apiUrl}${path}`, { headers: { 'Content-Type': 'application/json', ...options?.headers }, ...options }); if (!response.ok) throw new Error('No se pudo comunicar con la API.'); if (response.status === 204) return undefined as T; return response.json() as Promise<T> }
+export const portfolioApi = { get: () => request<PortfolioData>('/portfolio'), createItem: (item: Omit<PortfolioItem, 'id'>) => request<PortfolioItem>('/items', { method: 'POST', body: JSON.stringify(item) }), updateItem: (id: number, item: Omit<PortfolioItem, 'id'>) => request<PortfolioItem>(`/items/${id}`, { method: 'PUT', body: JSON.stringify(item) }), deleteItem: (id: number) => request<void>(`/items/${id}`, { method: 'DELETE' }), updateProfile: (profile: Profile) => request<Profile>('/profile', { method: 'PUT', body: JSON.stringify(profile) }) }

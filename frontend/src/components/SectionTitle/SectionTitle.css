@@ -1,0 +1,1 @@
+.section-title { margin-bottom: 2.5rem; }.section-title p { margin-bottom: .55rem; color: var(--accent); font-size: .78rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }.section-title h2 { max-width: 720px; margin: 0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1; letter-spacing: -.06em; }
