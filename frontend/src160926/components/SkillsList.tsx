@@ -1,36 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 // 1. Definir el type basado en las columnas de tu base de datos
 type ItemData = {
-  id: number | string;       // El identificador único
-  titulo: string;            // Campo título
-  descripcion: string;       // Campo descripción
+  id: number | string; // El identificador único
+  titulo: string; // Campo título
+  descripcion: string; // Campo descripción
 };
 
+/** Consulta las habilidades de la API antigua y las presenta en una lista. */
 function SkillsList() {
   // 2. Indicarle a useState que el estado es un arreglo de ItemData
   const [items, setItems] = useState<ItemData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('https://r4-7v1k.onrender.com/api/listado', {
-      method: 'POST',
+    // La petición se realiza solo al montar el componente.
+    fetch("https://r4-7v1k.onrender.com/api/listado", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       // body: JSON.stringify({...}) si necesitas enviar datos
     })
       .then((response) => response.json())
-      .then((data: ItemData[]) => { // Tipamos la respuesta de la API
+      .then((data: ItemData[]) => {
+        // Tipamos la respuesta de la API
         setItems(data);
         setLoading(false);
       })
       .catch((error) => {
-        console.error('Error al cargar los datos:', error);
+        console.error("Error al cargar los datos:", error);
         setLoading(false);
       });
   }, []);
 
+  // Evita renderizar una lista vacía mientras la solicitud sigue pendiente.
   if (loading) {
     return <p>Cargando datos...</p>;
   }

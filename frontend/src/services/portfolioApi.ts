@@ -1,5 +1,43 @@
-import type { PortfolioData, PortfolioItem, Profile } from '../types/portfolio.ts'
+import type {
+  PortfolioData,
+  PortfolioItem,
+  Profile,
+} from "../types/portfolio.ts";
 // En producción se define VITE_API_URL; durante desarrollo Vite redirige /api al backend local.
-const apiUrl = import.meta.env.VITE_API_URL ?? '/api'
-async function request<T>(path: string, options?: RequestInit): Promise<T> { const response = await fetch(`${apiUrl}${path}`, { headers: { 'Content-Type': 'application/json', ...options?.headers }, ...options }); if (!response.ok) throw new Error('No se pudo comunicar con la API.'); if (response.status === 204) return undefined as T; return response.json() as Promise<T> }
-export const portfolioApi = { get: () => request<PortfolioData>('/portfolio'), createItem: (item: Omit<PortfolioItem, 'id'>) => request<PortfolioItem>('/items', { method: 'POST', body: JSON.stringify(item) }), updateItem: (id: number, item: Omit<PortfolioItem, 'id'>) => request<PortfolioItem>(`/items/${id}`, { method: 'PUT', body: JSON.stringify(item) }), deleteItem: (id: number) => request<void>(`/items/${id}`, { method: 'DELETE' }), updateProfile: (profile: Profile) => request<Profile>('/profile', { method: 'PUT', body: JSON.stringify(profile) }) }
+const apiUrl = import.meta.env.VITE_API_URL ?? "/api";
+
+/**
+ * Envía una solicitud HTTP a la API y traduce una respuesta fallida en un error.
+ * El tipo genérico T indica el dato que se espera recibir al finalizar.
+ */
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${apiUrl}${path}`, {
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    ...options,
+  });
+  if (!response.ok) throw new Error("No se pudo comunicar con la API.");
+  if (response.status === 204) return undefined as T;
+  return response.json() as Promise<T>;
+}
+/** Operaciones disponibles para consultar y modificar los datos del portafolio. */
+export const portfolioApi = {
+  // La API expone esta lectura como POST; no lleva cuerpo porque solo solicita el portafolio.
+  load: () => request<PortfolioData>("/portfolio", { method: "POST" }),
+  createItem: (item: Omit<PortfolioItem, "id">) =>
+    request<PortfolioItem>("/items", {
+      method: "POST",
+      body: JSON.stringify(item),
+    }),
+  updateItem: (id: number, item: Omit<PortfolioItem, "id">) =>
+    request<PortfolioItem>(`/items/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(item),
+    }),
+  deleteItem: (id: number) =>
+    request<void>(`/items/${id}`, { method: "DELETE" }),
+  updateProfile: (profile: Profile) =>
+    request<Profile>("/profile", {
+      method: "PUT",
+      body: JSON.stringify(profile),
+    }),
+};

@@ -1,0 +1,323 @@
+import { useState, type FormEvent } from "react";
+import type {
+  PortfolioData,
+  PortfolioItem,
+  PortfolioSection,
+  Profile,
+} from "../../types/portfolio.ts";
+import "./AdminPanel.css";
+
+type Props = {
+  portfolio: PortfolioData;
+  busy: boolean;
+  onClose: () => void;
+  onCreate: (item: Omit<PortfolioItem, "id">) => Promise<void>;
+  onUpdate: (id: number, item: Omit<PortfolioItem, "id">) => Promise<void>;
+  onDelete: (id: number) => Promise<void>;
+  onUpdateProfile: (profile: Profile) => Promise<void>;
+};
+type ItemDraft = Omit<PortfolioItem, "id"> & { tagsText: string };
+const sections: PortfolioSection[] = [
+  "skills",
+  "experience",
+  "achievement",
+  "project",
+];
+const emptyDraft: ItemDraft = {
+  section: "skills",
+  title: "",
+  subtitle: "",
+  description: "",
+  dateLabel: "",
+  tags: [],
+  tagsText: "",
+  link: "",
+  imageUrl: "",
+  displayOrder: 1,
+};
+function draftFromItem(item?: PortfolioItem): ItemDraft {
+  return item ? { ...item, tagsText: item.tags.join(", ") } : emptyDraft;
+}
+
+function ItemForm({
+  item,
+  busy,
+  onSave,
+  onCancel,
+}: {
+  item?: PortfolioItem;
+  busy: boolean;
+  onSave: (draft: Omit<PortfolioItem, "id">) => Promise<void>;
+  onCancel: () => void;
+}) {
+  const [draft, setDraft] = useState<ItemDraft>(() => draftFromItem(item));
+  const update = <K extends keyof ItemDraft>(key: K, value: ItemDraft[K]) =>
+    setDraft((current) => ({ ...current, [key]: value }));
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const { tagsText, ...base } = draft;
+    await onSave({
+      ...base,
+      tags: tagsText
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+    });
+    if (!item) setDraft(emptyDraft);
+  }
+  return (
+    <form className="admin-form" onSubmit={submit}>
+      <h3>{item ? "Editar material" : "Agregar material"}</h3>
+      <label>
+        Sección
+        <select
+          value={draft.section}
+          onChange={(event) =>
+            update("section", event.target.value as PortfolioSection)
+          }
+        >
+          {sections.map((section) => (
+            <option key={section} value={section}>
+              {section}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Título
+        <input
+          required
+          value={draft.title}
+          onChange={(event) => update("title", event.target.value)}
+        />
+      </label>
+      <label>
+        Subtítulo
+        <input
+          value={draft.subtitle}
+          onChange={(event) => update("subtitle", event.target.value)}
+        />
+      </label>
+      <label>
+        Descripción
+        <textarea
+          required
+          rows={3}
+          value={draft.description}
+          onChange={(event) => update("description", event.target.value)}
+        />
+      </label>
+      <div className="admin-form__row">
+        <label>
+          Fecha o tecnología
+          <input
+            value={draft.dateLabel}
+            onChange={(event) => update("dateLabel", event.target.value)}
+          />
+        </label>
+        <label>
+          Orden
+          <input
+            min="1"
+            type="number"
+            value={draft.displayOrder}
+            onChange={(event) =>
+              update("displayOrder", Number(event.target.value))
+            }
+          />
+        </label>
+      </div>
+      <label>
+        Etiquetas (separadas por coma)
+        <input
+          value={draft.tagsText}
+          onChange={(event) => update("tagsText", event.target.value)}
+        />
+      </label>
+      <label>
+        Enlace
+        <input
+          type="url"
+          value={draft.link}
+          onChange={(event) => update("link", event.target.value)}
+        />
+      </label>
+      <label>
+        URL de imagen
+        <input
+          type="url"
+          value={draft.imageUrl}
+          onChange={(event) => update("imageUrl", event.target.value)}
+        />
+      </label>
+      <div className="admin-actions">
+        <button className="admin-button" disabled={busy}>
+          {busy ? "Guardando…" : "Guardar"}
+        </button>
+        {item && (
+          <button
+            className="admin-button admin-button--secondary"
+            type="button"
+            onClick={onCancel}
+          >
+            Cancelar edición
+          </button>
+        )}
+      </div>
+    </form>
+  );
+}
+
+function AdminPanel({
+  portfolio,
+  busy,
+  onClose,
+  onCreate,
+  onUpdate,
+  onDelete,
+  onUpdateProfile,
+}: Props) {
+  const [profile, setProfile] = useState(portfolio.profile);
+  const [editing, setEditing] = useState<PortfolioItem | undefined>();
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onUpdateProfile(profile);
+  }
+  return (
+    <div className="admin-overlay" role="presentation">
+      <section
+        className="admin-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-title"
+      >
+        <header className="admin-panel__header">
+          <div>
+            <p>Modo administrador</p>
+            <h2 id="admin-title">Editar portfolio</h2>
+          </div>
+          <button
+            className="admin-close"
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar editor"
+          >
+            ×
+          </button>
+        </header>
+        <p className="admin-panel__notice">
+          Este acceso no tiene autenticación todavía. No compartas la URL de
+          producción hasta implementarla.
+        </p>
+        <form className="admin-form admin-profile" onSubmit={saveProfile}>
+          <h3>Datos personales</h3>
+          <label>
+            Nombre
+            <input
+              required
+              value={profile.name}
+              onChange={(event) =>
+                setProfile({ ...profile, name: event.target.value })
+              }
+            />
+          </label>
+          <label>
+            Rol
+            <input
+              required
+              value={profile.role}
+              onChange={(event) =>
+                setProfile({ ...profile, role: event.target.value })
+              }
+            />
+          </label>
+          <label>
+            Presentación
+            <textarea
+              required
+              rows={3}
+              value={profile.intro}
+              onChange={(event) =>
+                setProfile({ ...profile, intro: event.target.value })
+              }
+            />
+          </label>
+          <div className="admin-form__row">
+            <label>
+              Email
+              <input
+                required
+                type="email"
+                value={profile.email}
+                onChange={(event) =>
+                  setProfile({ ...profile, email: event.target.value })
+                }
+              />
+            </label>
+            <label>
+              Ubicación
+              <input
+                value={profile.location}
+                onChange={(event) =>
+                  setProfile({ ...profile, location: event.target.value })
+                }
+              />
+            </label>
+          </div>
+          <label>
+            Disponibilidad
+            <input
+              value={profile.availability}
+              onChange={(event) =>
+                setProfile({ ...profile, availability: event.target.value })
+              }
+            />
+          </label>
+          <button className="admin-button" disabled={busy}>
+            {busy ? "Guardando…" : "Guardar perfil"}
+          </button>
+        </form>
+        <div className="admin-materials">
+          <ItemForm
+            key={editing?.id ?? "new"}
+            item={editing}
+            busy={busy}
+            onCancel={() => setEditing(undefined)}
+            onSave={async (draft) => {
+              if (editing) {
+                await onUpdate(editing.id, draft);
+                setEditing(undefined);
+              } else {
+                await onCreate(draft);
+              }
+            }}
+          />
+          <div className="admin-list">
+            <h3>Materiales existentes</h3>
+            {portfolio.items.map((item) => (
+              <article key={item.id}>
+                <span>{item.section}</span>
+                <strong>{item.title}</strong>
+                <div>
+                  <button type="button" onClick={() => setEditing(item)}>
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm(`¿Eliminar “${item.title}”?`))
+                        void onDelete(item.id);
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+export default AdminPanel;

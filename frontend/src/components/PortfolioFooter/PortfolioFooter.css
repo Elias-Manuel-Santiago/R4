@@ -1,1 +1,31 @@
-.portfolio-footer { position: relative; padding: 1.4rem 1rem; color: var(--text-muted); background: var(--surface-muted); border-top: 3px solid var(--border); font-size: .75rem; text-align: center; }.portfolio-footer p { margin: 0; }.admin-trigger { position: absolute; right: .5rem; bottom: .35rem; width: .8rem; height: .8rem; padding: 0; color: var(--text); background: transparent; border: 0; opacity: .12; font-size: .9rem; line-height: 1; }.admin-trigger:hover, .admin-trigger:focus-visible { opacity: 1; }
+/* Pie de página y botón discreto que abre el editor administrativo. */
+.portfolio-footer {
+  position: relative;
+  padding: 1.4rem 1rem;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border-top: 3px solid var(--border);
+  font-size: 0.75rem;
+  text-align: center;
+}
+.portfolio-footer p {
+  margin: 0;
+}
+.admin-trigger {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.35rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  padding: 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  opacity: 0.12;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.admin-trigger:hover,
+.admin-trigger:focus-visible {
+  opacity: 1;
+}

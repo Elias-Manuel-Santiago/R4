@@ -2,9 +2,11 @@ import express from "express";
 import { listarSkills } from "./modules/consultas.js";
 import cors from "cors";
 
+// Servidor de la versión anterior, conservado como referencia funcional mínima.
 const app = express();
 const port = 10001;
 
+// Autoriza que el cliente local consulte esta API durante el desarrollo.
 app.use(cors());
 
 /*
@@ -18,11 +20,11 @@ app.use((req, res, next) => {
 });*/
 app.use(express.json());
 
-app.post("/api/listado", async (req, res) => {
-    const resultados = await listarSkills();
-    res.status(200).json(resultados);
+// Devuelve las habilidades almacenadas en la base de datos.
+app.post("/api/listado", async (_req, res) => {
+  const resultados = await listarSkills();
+  res.status(200).json(resultados);
 });
-
 
 app.listen(port, () => {
   console.log(`API escuchando en http://localhost:${port}`);

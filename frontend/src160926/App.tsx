@@ -1,13 +1,13 @@
-import './App.css'
-import SkillsList from './components/SkillsList.tsx'
+import "./App.css";
+import SkillsList from "./components/SkillsList.tsx";
 
+/** Contenedor mínimo de la versión anterior; delega la vista a SkillsList. */
 function App() {
-
   return (
     <>
-    <SkillsList />
+      <SkillsList />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

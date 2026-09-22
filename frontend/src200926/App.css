@@ -1,0 +1,57 @@
+.app-shell {
+  overflow: hidden;
+}
+.portfolio-section {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 5.5rem 1.5rem;
+}
+.portfolio-section--tinted {
+  width: 100%;
+  padding-inline: max(1.5rem, calc((100% - 1040px) / 2));
+  background: var(--surface-muted);
+  border-block: 3px solid var(--border);
+}
+.portfolio-section--contact {
+  text-align: center;
+}
+.connection-notice {
+  width: min(900px, calc(100% - 2rem));
+  margin: 1.25rem auto -1.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  background: var(--warning);
+  border: 2px solid var(--border);
+  font-size: 0.88rem;
+  text-align: center;
+}
+.contact-link {
+  display: inline-block;
+  padding: 0.8rem 1rem;
+  color: var(--surface);
+  background: var(--accent);
+  border: 3px solid var(--border);
+  box-shadow: 5px 5px 0 var(--shadow);
+  font-size: clamp(1.05rem, 3vw, 1.5rem);
+  font-weight: 800;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+.contact-link:hover {
+  background: var(--accent-hover);
+  box-shadow: 7px 7px 0 var(--shadow);
+  transform: translate(-2px, -2px);
+}
+@media (max-width: 600px) {
+  .portfolio-section {
+    width: 100%;
+    padding: 3.75rem 1rem;
+  }
+  .portfolio-section--tinted {
+    padding-inline: 1rem;
+  }
+}

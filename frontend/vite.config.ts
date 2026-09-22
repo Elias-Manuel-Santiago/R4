@@ -1,16 +1,13 @@
-import react, { reactCompilerPreset } from '@vitejs/plugin-react'
-import babel from '@rolldown/plugin-babel'
-import { defineConfig } from 'vite'
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import { defineConfig } from "vite";
 
-// https://vite.dev/config/
+// Vite compila React y redirige /api al backend local durante el desarrollo.
 export default defineConfig({
-  plugins: [
-    react(),
-    babel({ presets: [reactCompilerPreset()] })
-  ],
+  plugins: [react(), babel({ presets: [reactCompilerPreset()] })],
   server: {
     proxy: {
-      '/api': 'http://localhost:10001',
+      "/api": "http://localhost:10001",
     },
   },
-})
+});
