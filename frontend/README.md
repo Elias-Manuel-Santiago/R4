@@ -7,4 +7,8 @@ Vite redirige las solicitudes `/api` al backend local. Para producción, crear u
 
 `src/data/portfolioSnapshot.json` es la copia local que se muestra inmediatamente al entrar. El backend la actualiza tras cada edición y también al iniciarse; si se necesita actualizarla antes de compilar o desplegar el frontend, ejecutar `npm run cache:portfolio` desde `backend`.
 
+## Deploy en Render
+
+Cuando el frontend es un Static Site separado y su Root Directory es `frontend`, configurá el Build Command como `cd ../backend && npm ci && npm run cache:portfolio && cd ../frontend && npm ci && npm run build` y el Publish Directory como `dist`. Así el JSON se genera desde la base antes de compilar los archivos estáticos.
+
 El pequeño punto en el extremo inferior derecho del pie abre el modo administrador. Por ahora es un acceso de edición temporal y no reemplaza un sistema de autenticación.

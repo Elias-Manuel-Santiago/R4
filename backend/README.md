@@ -8,6 +8,8 @@ La API expone `GET /api/portfolio` y las rutas de edición `POST/PUT/DELETE /api
 
 Cada edición regenera `../frontend/src/data/portfolioSnapshot.json`, que Vite integra en la primera carga del sitio. Para sincronizarlo manualmente antes de publicar el frontend, ejecutar `npm run cache:portfolio`.
 
+Si el frontend se publica como Static Site separado en Render, ejecutá ese comando dentro del Build Command de dicho sitio antes de `npm run build`; no lo agregues al Start Command del backend.
+
 ## Acceso administrador
 
 Configurá estos secretos en el servicio backend de Render (no los subas al repositorio):
