@@ -6,6 +6,7 @@
   --text: #302a24;
   --text-muted: #665b4d;
   --accent: #b84a39;
+  --accent-background:#b84a39; 
   --accent-hover: #96392c;
   --border: #302a24;
   --shadow: #302a24;
@@ -24,6 +25,7 @@
   --text: #f8e7b7;
   --text-muted: #cbbd99;
   --accent: #ff785d;
+  --accent-background:#9e4335; 
   --accent-hover: #ff9b85;
   --border: #f8e7b7;
   --shadow: #0b0910;
@@ -46,7 +48,7 @@ body {
   margin: 0;
   background-color: var(--background);
   /* Un radio subpíxel se pierde por el antialiasing a 100 % de zoom. */
-  background-image: radial-gradient(circle, var(--accent) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--accent-background) 1px, transparent 1px);
   background-size: 16px 16px;
   transition:
     background-color 0.2s,
