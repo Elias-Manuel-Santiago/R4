@@ -1,6 +1,8 @@
 /* Estructura general de la página y estilos compartidos por sus secciones. */
 .app-shell {
-  overflow: hidden;
+  /* clip evita el desborde de las animaciones sin crear un contenedor de scroll.
+     Así el encabezado sticky se referencia al viewport. */
+  overflow-x: clip;
 }
 .portfolio-section {
   width: min(1100px, calc(100% - 2rem));

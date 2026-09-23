@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { portfolioFallback } from "../data/portfolioFallback.ts";
+import portfolioSnapshot from "../data/portfolioSnapshot.json";
 import { portfolioApi } from "../services/portfolioApi.ts";
 import type {
   PortfolioData,
@@ -15,12 +15,14 @@ const sections: PortfolioSection[] = [
   "project",
 ];
 export function usePortfolio() {
-  // El contenido local conserva una página visible mientras llega la respuesta remota.
-  const [data, setData] = useState<PortfolioData>(portfolioFallback);
+  // El snapshot se incorpora al bundle, por lo que la primera vista no espera a la base.
+  const [data, setData] = useState<PortfolioData>(
+    portfolioSnapshot as PortfolioData,
+  );
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
   useEffect(() => {
-    // La consulta inicial se hace una única vez cuando se monta quien use este hook.
+    // Luego se sincroniza en segundo plano con la información más reciente de la API.
     portfolioApi
       .load()
       .then(setData)

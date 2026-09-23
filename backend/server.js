@@ -8,6 +8,7 @@ import {
   listarPortfolio,
   listarSkills,
 } from "./modules/consultas.js";
+import { actualizarSnapshotPortfolio } from "./modules/portfolioSnapshot.js";
 
 // Instancia de Express que recibe las solicitudes HTTP del frontend.
 const app = express();
@@ -43,6 +44,7 @@ app.post(
   "/api/items",
   asyncRoute(async (req, res) => {
     const item = await crearItem(req.body);
+    await actualizarSnapshotPortfolio();
     res.status(201).json(item);
   }),
 );
@@ -52,6 +54,7 @@ app.put(
   "/api/items/:id",
   asyncRoute(async (req, res) => {
     const item = await actualizarItem(Number(req.params.id), req.body);
+    await actualizarSnapshotPortfolio();
     res.json(item);
   }),
 );
@@ -61,6 +64,7 @@ app.delete(
   "/api/items/:id",
   asyncRoute(async (req, res) => {
     await eliminarItem(Number(req.params.id));
+    await actualizarSnapshotPortfolio();
     res.sendStatus(204);
   }),
 );
@@ -69,7 +73,9 @@ app.delete(
 app.put(
   "/api/profile",
   asyncRoute(async (req, res) => {
-    res.json(await actualizarPerfil(req.body));
+    const profile = await actualizarPerfil(req.body);
+    await actualizarSnapshotPortfolio();
+    res.json(profile);
   }),
 );
 
@@ -87,4 +93,9 @@ app.use((error, _req, res, _next) => {
 
 app.listen(port, () =>
   console.log(`API escuchando en http://localhost:${port}`),
+);
+
+// Al iniciar se renueva el archivo aunque no haya habido una edición desde la API.
+actualizarSnapshotPortfolio().catch((error) =>
+  console.error("No se pudo actualizar el snapshot del portafolio:", error),
 );
