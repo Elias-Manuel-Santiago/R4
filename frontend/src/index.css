@@ -46,7 +46,7 @@ body {
   margin: 0;
   background-color: var(--background);
   /* Un radio subpíxel se pierde por el antialiasing a 100 % de zoom. */
-  background-image: radial-gradient(circle, var(--accent) 1.25px, transparent 1.5px);
+  background-image: radial-gradient(circle, var(--accent) 1px, transparent 1px);
   background-size: 16px 16px;
   transition:
     background-color 0.2s,
