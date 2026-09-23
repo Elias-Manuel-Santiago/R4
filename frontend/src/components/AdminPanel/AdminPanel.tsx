@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import type {
   PortfolioData,
   PortfolioItem,
@@ -37,6 +37,21 @@ const sections: PortfolioSection[] = [
   "achievement",
   "project",
 ];
+/** Nombres visibles y orden de agrupación para los tipos de material. */
+const sectionLabels: Record<PortfolioSection, string> = {
+  skills: "Habilidades",
+  experience: "Experiencia",
+  achievement: "Logros",
+  project: "Proyectos",
+};
+type ConditionalField = "dateLabel" | "tagsText" | "link" | "imageUrl";
+/** Campos que se muestran en cada tipo según los componentes públicos del portfolio. */
+const availableFields: Record<PortfolioSection, readonly ConditionalField[]> = {
+  skills: ["tagsText"],
+  experience: ["dateLabel"],
+  achievement: ["dateLabel"],
+  project: ["dateLabel", "tagsText", "link", "imageUrl"],
+};
 /** Valores iniciales usados al crear un material nuevo. */
 const emptyDraft: ItemDraft = {
   section: "skills",
@@ -53,6 +68,25 @@ const emptyDraft: ItemDraft = {
 /** Convierte las etiquetas del array a texto separado por comas para el formulario. */
 function draftFromItem(item?: PortfolioItem): ItemDraft {
   return item ? { ...item, tagsText: item.tags.join(", ") } : emptyDraft;
+}
+
+/** Evita guardar información que no se utiliza en el tipo seleccionado. */
+function itemFromDraft(draft: ItemDraft): Omit<PortfolioItem, "id"> {
+  const { tagsText, ...base } = draft;
+  const fieldIsAvailable = (field: ConditionalField) =>
+    availableFields[draft.section].includes(field);
+  return {
+    ...base,
+    dateLabel: fieldIsAvailable("dateLabel") ? base.dateLabel : "",
+    tags: fieldIsAvailable("tagsText")
+      ? tagsText
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+      : [],
+    link: fieldIsAvailable("link") ? base.link : "",
+    imageUrl: fieldIsAvailable("imageUrl") ? base.imageUrl : "",
+  };
 }
 
 /** Formulario reutilizable: crea un material o carga uno existente para editarlo. */
@@ -73,19 +107,13 @@ function ItemForm({
     setDraft((current) => ({ ...current, [key]: value }));
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // La API necesita un array de etiquetas, mientras que el usuario escribe una cadena.
-    const { tagsText, ...base } = draft;
-    await onSave({
-      ...base,
-      tags: tagsText
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    });
+    await onSave(itemFromDraft(draft));
     if (!item) setDraft(emptyDraft);
   }
+  const fieldIsAvailable = (field: ConditionalField) =>
+    availableFields[draft.section].includes(field);
   return (
-    <form className="admin-form" onSubmit={submit}>
+    <form className="admin-form admin-item-form" onSubmit={submit}>
       <h3>{item ? "Editar material" : "Agregar material"}</h3>
       <label>
         Sección
@@ -97,7 +125,7 @@ function ItemForm({
         >
           {sections.map((section) => (
             <option key={section} value={section}>
-              {section}
+              {sectionLabels[section]}
             </option>
           ))}
         </select>
@@ -117,7 +145,7 @@ function ItemForm({
           onChange={(event) => update("subtitle", event.target.value)}
         />
       </label>
-      <label>
+      <label className="admin-form__full-width">
         Descripción
         <textarea
           required
@@ -126,10 +154,11 @@ function ItemForm({
           onChange={(event) => update("description", event.target.value)}
         />
       </label>
-      <div className="admin-form__row">
+      <div className="admin-form__row admin-form__full-width">
         <label>
-          Fecha o tecnología
+          {draft.section === "project" ? "Tecnologías" : "Fecha"}
           <input
+            disabled={!fieldIsAvailable("dateLabel")}
             value={draft.dateLabel}
             onChange={(event) => update("dateLabel", event.target.value)}
           />
@@ -149,6 +178,7 @@ function ItemForm({
       <label>
         Etiquetas (separadas por coma)
         <input
+          disabled={!fieldIsAvailable("tagsText")}
           value={draft.tagsText}
           onChange={(event) => update("tagsText", event.target.value)}
         />
@@ -156,6 +186,7 @@ function ItemForm({
       <label>
         Enlace
         <input
+          disabled={!fieldIsAvailable("link")}
           type="url"
           value={draft.link}
           onChange={(event) => update("link", event.target.value)}
@@ -164,12 +195,13 @@ function ItemForm({
       <label>
         URL de imagen
         <input
+          disabled={!fieldIsAvailable("imageUrl")}
           type="url"
           value={draft.imageUrl}
           onChange={(event) => update("imageUrl", event.target.value)}
         />
       </label>
-      <div className="admin-actions">
+      <div className="admin-actions admin-form__full-width">
         <button className="admin-button" disabled={busy}>
           {busy ? "Guardando…" : "Guardar"}
         </button>
@@ -203,6 +235,16 @@ function AdminPanel({
   const [pendingDeletion, setPendingDeletion] = useState<
     PortfolioItem | undefined
   >();
+  const itemsBySection = useMemo(
+    () =>
+      [...portfolio.items].sort(
+        (first, second) =>
+          sections.indexOf(first.section) - sections.indexOf(second.section) ||
+          first.displayOrder - second.displayOrder ||
+          first.id - second.id,
+      ),
+    [portfolio.items],
+  );
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await onUpdateProfile(profile);
@@ -256,7 +298,7 @@ function AdminPanel({
               }
             />
           </label>
-          <label>
+          <label className="admin-form__full-width">
             Presentación
             <textarea
               required
@@ -267,7 +309,7 @@ function AdminPanel({
               }
             />
           </label>
-          <div className="admin-form__row">
+          <div className="admin-form__row admin-form__full-width">
             <label>
               Email
               <input
@@ -289,7 +331,7 @@ function AdminPanel({
               />
             </label>
           </div>
-          <label>
+          <label className="admin-form__full-width">
             Disponibilidad
             <input
               value={profile.availability}
@@ -298,7 +340,10 @@ function AdminPanel({
               }
             />
           </label>
-          <button className="admin-button" disabled={busy}>
+          <button
+            className="admin-button admin-form__full-width"
+            disabled={busy}
+          >
             {busy ? "Guardando…" : "Guardar perfil"}
           </button>
         </form>
@@ -321,9 +366,9 @@ function AdminPanel({
           />
           <div className="admin-list">
             <h3>Materiales existentes</h3>
-            {portfolio.items.map((item) => (
+            {itemsBySection.map((item) => (
               <article key={item.id}>
-                <span>{item.section}</span>
+                <span>{sectionLabels[item.section]}</span>
                 <strong>{item.title}</strong>
                 <div>
                   <button type="button" onClick={() => setEditing(item)}>
