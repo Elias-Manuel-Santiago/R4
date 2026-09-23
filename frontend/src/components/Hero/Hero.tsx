@@ -1,5 +1,5 @@
 import { keyframes } from "@emotion/react";
-import Reveal, { Fade } from "react-awesome-reveal";
+import Reveal from "react-awesome-reveal";
 import type { Profile } from "../../types/portfolio.ts";
 import "./Hero.css";
 /** Perfil que alimenta el bloque de presentación principal. */
