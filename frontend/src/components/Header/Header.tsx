@@ -11,7 +11,6 @@ function Header({ name }: HeaderProps) {
         href="#inicio"
         aria-label="Ir al inicio"
       >
-        <span aria-hidden="true">✦</span>
         {name}
       </a>
       <nav aria-label="Navegación principal">
