@@ -22,6 +22,10 @@
   margin-inline: auto;
   text-align: center;
 }
+.portfolio-section--contact .section-title h2 {
+  margin-inline: auto;
+  text-align: center;
+}
 .contact-links {
   display: flex;
   flex-wrap: wrap;
