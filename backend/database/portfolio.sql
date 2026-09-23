@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS portfolio_profile (
   role VARCHAR(120) NOT NULL,
   intro TEXT NOT NULL,
   email VARCHAR(150) NOT NULL,
+  telefono VARCHAR(40) NOT NULL DEFAULT '',
   location VARCHAR(120) NOT NULL DEFAULT '',
   availability VARCHAR(150) NOT NULL DEFAULT '',
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -29,8 +30,8 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Datos de arranque: se insertan una sola vez y luego se editan desde el modo administrador.
-INSERT IGNORE INTO portfolio_profile (id, name, role, intro, email, location, availability)
-VALUES (1, 'Ana Martínez', 'Desarrolladora Frontend', 'Diseño interfaces claras, accesibles y con personalidad para transformar ideas en experiencias digitales.', 'ana.martinez@email.com', 'Buenos Aires, Argentina', 'Disponible para nuevos proyectos');
+INSERT IGNORE INTO portfolio_profile (id, name, role, intro, email, telefono, location, availability)
+VALUES (1, 'Ana Martínez', 'Desarrolladora Frontend', 'Diseño interfaces claras, accesibles y con personalidad para transformar ideas en experiencias digitales.', 'ana.martinez@email.com', '+54 11 5555-0100', 'Buenos Aires, Argentina', 'Disponible para nuevos proyectos');
 
 INSERT INTO portfolio_items (section, title, subtitle, description, date_label, tags, link, image_url, display_order)
 SELECT 'skills', 'React', 'Interfaces', 'Componentes reutilizables, estado y eventos.', '', JSON_ARRAY('Hooks', 'JSX'), '', '', 1

@@ -7,6 +7,7 @@ const profileDefault = {
   role: "",
   intro: "",
   email: "",
+  phone: "",
   location: "",
   availability: "",
 };
@@ -74,7 +75,15 @@ function profileValues(profile) {
     !String(profile.email ?? "").trim()
   )
     throw clientError("Nombre, rol y email son obligatorios.");
-  return ["name", "role", "intro", "email", "location", "availability"].map(
+  return [
+    "name",
+    "role",
+    "intro",
+    "email",
+    "phone",
+    "location",
+    "availability",
+  ].map(
     (field) => String(profile[field] ?? "").trim(),
   );
 }
@@ -94,7 +103,7 @@ export async function listarSkills() {
 /** Obtiene perfil e items en dos consultas y los combina en la respuesta de la API. */
 export async function listarPortfolio() {
   const [profiles] = await connection.query(
-    "SELECT name, role, intro, email, location, availability FROM portfolio_profile WHERE id = 1",
+    "SELECT name, role, intro, email, telefono AS phone, location, availability FROM portfolio_profile WHERE id = 1",
   );
   const [items] = await connection.query(
     `SELECT ${itemColumns} FROM portfolio_items ORDER BY display_order, id`,
@@ -151,11 +160,11 @@ export async function eliminarItem(id) {
 export async function actualizarPerfil(profile) {
   const values = profileValues(profile);
   await connection.execute(
-    "INSERT INTO portfolio_profile (id, name, role, intro, email, location, availability) VALUES (1, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), intro = VALUES(intro), email = VALUES(email), location = VALUES(location), availability = VALUES(availability)",
+    "INSERT INTO portfolio_profile (id, name, role, intro, email, telefono, location, availability) VALUES (1, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), intro = VALUES(intro), email = VALUES(email), telefono = VALUES(telefono), location = VALUES(location), availability = VALUES(availability)",
     values,
   );
   const [rows] = await connection.query(
-    "SELECT name, role, intro, email, location, availability FROM portfolio_profile WHERE id = 1",
+    "SELECT name, role, intro, email, telefono AS phone, location, availability FROM portfolio_profile WHERE id = 1",
   );
   return rows[0];
 }

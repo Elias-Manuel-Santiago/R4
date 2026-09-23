@@ -7,7 +7,7 @@ type Props = { onOpenAdmin: () => void };
 function PortfolioFooter({ onOpenAdmin }: Props) {
   return (
     <footer className="portfolio-footer">
-      <p>Hecho con React, hooks y mucho mate.</p>
+      <p>Re corrupto el hector en el handball de ayer</p>
       <button
         className="admin-trigger"
         type="button"

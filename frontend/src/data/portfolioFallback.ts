@@ -10,6 +10,7 @@ export const portfolioFallback: PortfolioData = {
     intro:
       "Diseño interfaces claras, accesibles y con personalidad para transformar ideas en experiencias digitales.",
     email: "ana.martinez@email.com",
+    phone: "+54 11 5555-0100",
     location: "Buenos Aires, Argentina",
     availability: "Disponible para nuevos proyectos",
   },

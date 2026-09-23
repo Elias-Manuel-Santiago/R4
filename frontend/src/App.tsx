@@ -82,7 +82,7 @@ function App() {
         <Fade triggerOnce>
           <SectionTitle
             eyebrow="04 / contacto"
-            title="¿Creamos algo útil juntas?"
+            title="Si me necesitás"
           />
           <a
             className="contact-link"
@@ -90,6 +90,14 @@ function App() {
           >
             {portfolio.data.profile.email}
           </a>
+          {portfolio.data.profile.phone && (
+            <a
+              className="contact-link"
+              href={`tel:${portfolio.data.profile.phone.replace(/[^+\d]/g, "")}`}
+            >
+              {portfolio.data.profile.phone}
+            </a>
+          )}
         </Fade>
       </section>
       <PortfolioFooter onOpenAdmin={openAdmin} />

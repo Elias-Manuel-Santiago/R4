@@ -322,15 +322,26 @@ function AdminPanel({
               />
             </label>
             <label>
-              Ubicación
+              Teléfono
               <input
-                value={profile.location}
+                autoComplete="tel"
+                type="tel"
+                value={profile.phone}
                 onChange={(event) =>
-                  setProfile({ ...profile, location: event.target.value })
+                  setProfile({ ...profile, phone: event.target.value })
                 }
               />
             </label>
           </div>
+          <label className="admin-form__full-width">
+            Ubicación
+            <input
+              value={profile.location}
+              onChange={(event) =>
+                setProfile({ ...profile, location: event.target.value })
+              }
+            />
+          </label>
           <label className="admin-form__full-width">
             Disponibilidad
             <input

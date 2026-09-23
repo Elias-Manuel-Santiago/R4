@@ -23,6 +23,7 @@ export type Profile = {
   role: string;
   intro: string;
   email: string;
+  phone: string;
   location: string;
   availability: string;
 };
