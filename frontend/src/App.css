@@ -18,6 +18,16 @@
 .portfolio-section--contact {
   text-align: center;
 }
+.portfolio-section--contact .section-title {
+  margin-inline: auto;
+  text-align: center;
+}
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
 .connection-notice {
   width: min(900px, calc(100% - 2rem));
   margin: 1.25rem auto -1.5rem;
@@ -30,6 +40,7 @@
 }
 .contact-link {
   display: inline-block;
+  min-width: 0;
   padding: 0.8rem 1rem;
   color: var(--surface);
   background: var(--accent);

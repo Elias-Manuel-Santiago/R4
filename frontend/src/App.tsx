@@ -84,20 +84,22 @@ function App() {
             eyebrow="04 / contacto"
             title="Si me necesitás"
           />
-          <a
-            className="contact-link"
-            href={`mailto:${portfolio.data.profile.email}`}
-          >
-            {portfolio.data.profile.email}
-          </a>
-          {portfolio.data.profile.phone && (
+          <div className="contact-links">
             <a
               className="contact-link"
-              href={`tel:${portfolio.data.profile.phone.replace(/[^+\d]/g, "")}`}
+              href={`mailto:${portfolio.data.profile.email}`}
             >
-              {portfolio.data.profile.phone}
+              {portfolio.data.profile.email}
             </a>
-          )}
+            {portfolio.data.profile.phone && (
+              <a
+                className="contact-link"
+                href={`tel:${portfolio.data.profile.phone.replace(/[^+\d]/g, "")}`}
+              >
+                {portfolio.data.profile.phone}
+              </a>
+            )}
+          </div>
         </Fade>
       </section>
       <PortfolioFooter onOpenAdmin={openAdmin} />
