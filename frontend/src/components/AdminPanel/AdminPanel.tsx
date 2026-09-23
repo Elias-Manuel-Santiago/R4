@@ -200,9 +200,17 @@ function AdminPanel({
   const [profile, setProfile] = useState(portfolio.profile);
   // undefined representa el modo de creación; un item habilita el modo de edición.
   const [editing, setEditing] = useState<PortfolioItem | undefined>();
+  const [pendingDeletion, setPendingDeletion] = useState<
+    PortfolioItem | undefined
+  >();
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await onUpdateProfile(profile);
+  }
+  async function deletePendingItem() {
+    if (!pendingDeletion) return;
+    await onDelete(pendingDeletion.id);
+    setPendingDeletion(undefined);
   }
   return (
     <div className="admin-overlay" role="presentation">
@@ -323,20 +331,54 @@ function AdminPanel({
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      // La confirmación evita borrar un material por un clic accidental.
-                      if (window.confirm(`¿Eliminar “${item.title}”?`))
-                        void onDelete(item.id);
-                    }}
+                    disabled={busy}
+                    onClick={() => setPendingDeletion(item)}
                   >
                     Eliminar
                   </button>
                 </div>
               </article>
-            ))}
+          ))}
           </div>
         </div>
       </section>
+      {pendingDeletion && (
+        <div className="admin-confirmation" role="presentation">
+          <section
+            aria-describedby="delete-material-description"
+            aria-labelledby="delete-material-title"
+            aria-modal="true"
+            className="admin-confirmation__dialog"
+            role="dialog"
+          >
+            <p>Acción irreversible</p>
+            <h2 id="delete-material-title">¿Eliminar material?</h2>
+            <p id="delete-material-description">
+              Vas a eliminar “{pendingDeletion.title}”. Esta acción no se puede
+              deshacer.
+            </p>
+            <div className="admin-confirmation__actions">
+              <button
+                autoFocus
+                className="admin-button admin-button--secondary"
+                disabled={busy}
+                onClick={() => setPendingDeletion(undefined)}
+                type="button"
+              >
+                Cancelar
+              </button>
+              <button
+                className="admin-button admin-button--danger"
+                disabled={busy}
+                onClick={() => void deletePendingItem()}
+                type="button"
+              >
+                {busy ? "Eliminando…" : "Eliminar material"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

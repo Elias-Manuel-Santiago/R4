@@ -105,6 +105,9 @@
   color: var(--text);
   background: var(--surface);
 }
+.admin-button--danger {
+  background: var(--text);
+}
 .admin-button:disabled {
   cursor: wait;
   opacity: 0.65;
@@ -142,6 +145,45 @@
 }
 .admin-list button:last-child {
   background: var(--text);
+}
+.admin-confirmation {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(11 9 16 / 0.5);
+}
+.admin-confirmation__dialog {
+  width: min(440px, 100%);
+  padding: 1.5rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 3px solid var(--border);
+  box-shadow: 8px 8px 0 var(--accent);
+}
+.admin-confirmation__dialog > p:first-child {
+  margin-bottom: 0.35rem;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.admin-confirmation__dialog h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+.admin-confirmation__dialog > p:not(:first-child) {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.admin-confirmation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 @media (max-width: 720px) {
   .admin-materials,
