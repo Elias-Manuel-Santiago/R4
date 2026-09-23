@@ -45,7 +45,8 @@ body {
   min-height: 100svh;
   margin: 0;
   background-color: var(--background);
-  background-image: radial-gradient(var(--accent) 0.7px, transparent 0.7px);
+  /* Un radio subpíxel se pierde por el antialiasing a 100 % de zoom. */
+  background-image: radial-gradient(circle, var(--accent) 1.25px, transparent 1.5px);
   background-size: 16px 16px;
   transition:
     background-color 0.2s,
