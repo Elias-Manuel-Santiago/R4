@@ -55,7 +55,7 @@ function App() {
         className="portfolio-section portfolio-section--tinted"
         id="experiencia"
       >
-        <Slide direction="up" triggerOnce>
+        <Slide direction="left" triggerOnce>
           <SectionTitle
             eyebrow="02 / recorrido"
             title="Experiencia y logros."
