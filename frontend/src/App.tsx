@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Fade, Slide } from "react-awesome-reveal";
 import AdminPanel from "./components/AdminPanel/AdminPanel.tsx";
+import AdminLogin from "./components/AdminLogin/AdminLogin.tsx";
 import ExperienceList from "./components/ExperienceList/ExperienceList.tsx";
 import Header from "./components/Header/Header.tsx";
 import Hero from "./components/Hero/Hero.tsx";
@@ -18,6 +19,17 @@ function App() {
   const { tema, toggleTema } = useTema();
   const portfolio = usePortfolio();
   const [adminOpen, setAdminOpen] = useState(false);
+  const [adminLoginOpen, setAdminLoginOpen] = useState(false);
+  const [adminPassword, setAdminPassword] = useState<string>();
+
+  function openAdmin() {
+    setAdminLoginOpen(true);
+  }
+
+  function closeAdmin() {
+    setAdminPassword(undefined);
+    setAdminOpen(false);
+  }
 
   return (
     <main className="app-shell">
@@ -80,18 +92,30 @@ function App() {
           </a>
         </Fade>
       </section>
-      <PortfolioFooter onOpenAdmin={() => setAdminOpen(true)} />
+      <PortfolioFooter onOpenAdmin={openAdmin} />
       <ThemeButton tema={tema} onToggle={toggleTema} />
       {/* El formulario administrativo solo existe en pantalla después de abrirlo. */}
       {adminOpen && (
         <AdminPanel
           portfolio={portfolio.data}
           busy={portfolio.saving}
-          onClose={() => setAdminOpen(false)}
-          onCreate={portfolio.createItem}
-          onUpdate={portfolio.updateItem}
-          onDelete={portfolio.deleteItem}
-          onUpdateProfile={portfolio.updateProfile}
+          onClose={closeAdmin}
+          onCreate={(item) => portfolio.createItem(item, adminPassword!)}
+          onUpdate={(id, item) => portfolio.updateItem(id, item, adminPassword!)}
+          onDelete={(id) => portfolio.deleteItem(id, adminPassword!)}
+          onUpdateProfile={(profile) =>
+            portfolio.updateProfile(profile, adminPassword!)
+          }
+        />
+      )}
+      {adminLoginOpen && (
+        <AdminLogin
+          onAuthenticated={(password) => {
+            setAdminPassword(password);
+            setAdminLoginOpen(false);
+            setAdminOpen(true);
+          }}
+          onClose={() => setAdminLoginOpen(false)}
         />
       )}
     </main>

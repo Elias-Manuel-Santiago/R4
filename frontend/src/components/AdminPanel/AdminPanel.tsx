@@ -227,8 +227,7 @@ function AdminPanel({
           </button>
         </header>
         <p className="admin-panel__notice">
-          Este acceso no tiene autenticación todavía. No compartas la URL de
-          producción hasta implementarla.
+          La contraseña se verifica cada vez que guardás o eliminás contenido.
         </p>
         <form className="admin-form admin-profile" onSubmit={saveProfile}>
           <h3>Datos personales</h3>

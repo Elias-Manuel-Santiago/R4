@@ -53,14 +53,21 @@ export function usePortfolio() {
       setSaving(false);
     }
   }
-  const createItem = async (item: Omit<PortfolioItem, "id">) =>
+  const createItem = async (
+    item: Omit<PortfolioItem, "id">,
+    adminPassword: string,
+  ) =>
     execute(async () => {
-      const saved = await portfolioApi.createItem(item);
+      const saved = await portfolioApi.createItem(item, adminPassword);
       setData((current) => ({ ...current, items: [...current.items, saved] }));
     });
-  const updateItem = async (id: number, item: Omit<PortfolioItem, "id">) =>
+  const updateItem = async (
+    id: number,
+    item: Omit<PortfolioItem, "id">,
+    adminPassword: string,
+  ) =>
     execute(async () => {
-      const saved = await portfolioApi.updateItem(id, item);
+      const saved = await portfolioApi.updateItem(id, item, adminPassword);
       setData((current) => ({
         ...current,
         items: current.items.map((currentItem) =>
@@ -68,17 +75,17 @@ export function usePortfolio() {
         ),
       }));
     });
-  const deleteItem = async (id: number) =>
+  const deleteItem = async (id: number, adminPassword: string) =>
     execute(async () => {
-      await portfolioApi.deleteItem(id);
+      await portfolioApi.deleteItem(id, adminPassword);
       setData((current) => ({
         ...current,
         items: current.items.filter((item) => item.id !== id),
       }));
     });
-  const updateProfile = async (profile: Profile) =>
+  const updateProfile = async (profile: Profile, adminPassword: string) =>
     execute(async () => {
-      const saved = await portfolioApi.updateProfile(profile);
+      const saved = await portfolioApi.updateProfile(profile, adminPassword);
       setData((current) => ({ ...current, profile: saved }));
     });
   return {

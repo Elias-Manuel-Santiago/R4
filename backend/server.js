@@ -9,18 +9,69 @@ import {
   listarSkills,
 } from "./modules/consultas.js";
 import { actualizarSnapshotPortfolio } from "./modules/portfolioSnapshot.js";
+import {
+  adminAuthIsConfigured,
+  passwordIsValid,
+} from "./modules/adminAuth.js";
 
 // Instancia de Express que recibe las solicitudes HTTP del frontend.
 const app = express();
 const port = process.env.PORT || 10001;
 
+// Render ubica la aplicación detrás de un único proxy; así req.ip identifica al cliente real.
+app.set("trust proxy", 1);
 // CORS permite al frontend alojado en otro origen consultar esta API.
 app.use(cors());
 app.use(express.json());
 
+const loginAttempts = new Map();
+const maximumLoginAttempts = 5;
+const loginAttemptWindowMs = 15 * 60 * 1000;
+
+/** Reduce intentos automatizados de adivinar la contraseña en una misma IP. */
+function canTryLogin(ip) {
+  const currentTime = Date.now();
+  const attempts = (loginAttempts.get(ip) ?? []).filter(
+    (time) => currentTime - time < loginAttemptWindowMs,
+  );
+  loginAttempts.set(ip, attempts);
+  return attempts.length < maximumLoginAttempts;
+}
+function registerFailedLogin(ip) {
+  loginAttempts.set(ip, [...(loginAttempts.get(ip) ?? []), Date.now()]);
+}
+
+/** Protege toda modificación verificando la contraseña que acompaña la solicitud. */
+function requireAdmin(req, res, next) {
+  if (!adminAuthIsConfigured())
+    return res.status(503).json({ message: "El acceso administrador no está configurado." });
+  if (!canTryLogin(req.ip))
+    return res.status(429).json({ message: "Demasiados intentos. Probá de nuevo más tarde." });
+  if (!passwordIsValid(req.get("x-admin-password"))) {
+    registerFailedLogin(req.ip);
+    return res.status(401).json({ message: "Contraseña incorrecta." });
+  }
+  loginAttempts.delete(req.ip);
+  next();
+}
+
 // Evita repetir try/catch en cada ruta asíncrona de la API.
 const asyncRoute = (handler) => (req, res, next) =>
   Promise.resolve(handler(req, res, next)).catch(next);
+
+// Comprueba la contraseña antes de abrir el panel, sin crear ni guardar una sesión.
+app.post("/api/admin/verify", (req, res) => {
+  if (!adminAuthIsConfigured())
+    return res.status(503).json({ message: "El acceso administrador no está configurado." });
+  if (!canTryLogin(req.ip))
+    return res.status(429).json({ message: "Demasiados intentos. Probá de nuevo más tarde." });
+  if (!passwordIsValid(req.body?.password)) {
+    registerFailedLogin(req.ip);
+    return res.status(401).json({ message: "Contraseña incorrecta." });
+  }
+  loginAttempts.delete(req.ip);
+  res.sendStatus(204);
+});
 
 // Se conserva esta ruta para no romper el ejemplo inicial ni clientes anteriores.
 // Ruta antigua mantenida para los clientes que todavía consumen solo habilidades.
@@ -42,6 +93,7 @@ app.post(
 // Crea un material y responde con el registro, incluido el id asignado por la base.
 app.post(
   "/api/items",
+  requireAdmin,
   asyncRoute(async (req, res) => {
     const item = await crearItem(req.body);
     await actualizarSnapshotPortfolio();
@@ -52,6 +104,7 @@ app.post(
 // Reemplaza los datos editables de un material existente.
 app.put(
   "/api/items/:id",
+  requireAdmin,
   asyncRoute(async (req, res) => {
     const item = await actualizarItem(Number(req.params.id), req.body);
     await actualizarSnapshotPortfolio();
@@ -62,6 +115,7 @@ app.put(
 // Borra un material y responde 204 porque no hay contenido que devolver.
 app.delete(
   "/api/items/:id",
+  requireAdmin,
   asyncRoute(async (req, res) => {
     await eliminarItem(Number(req.params.id));
     await actualizarSnapshotPortfolio();
@@ -72,6 +126,7 @@ app.delete(
 // Guarda los datos de presentación de la persona dueña del portafolio.
 app.put(
   "/api/profile",
+  requireAdmin,
   asyncRoute(async (req, res) => {
     const profile = await actualizarPerfil(req.body);
     await actualizarSnapshotPortfolio();
